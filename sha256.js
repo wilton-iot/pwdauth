@@ -15,15 +15,17 @@
  */
 
 define([
+    "lodash/isNil",
+    "lodash/isString",
     "sjcl",
     "utf8"
-], function(sjcl, utf8) {
+], function(isNil, isString, sjcl, utf8) {
     "use strict";
 
     function defaultString(str) {
-        if ("string" === typeof (str)) {
+        if (isString(str)) {
             return str;
-        } else if (!undefinedOrNull(str)) {
+        } else if (!isNil(str)) {
             return String(str);
         } else {
             return "";
