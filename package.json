@@ -1,0 +1,7 @@
+{
+  "wilton": {
+    "excludes": [
+      "test.js"
+    ]
+  }
+}
