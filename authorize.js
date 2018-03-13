@@ -20,53 +20,37 @@ define([
     "lodash/isFunction",
     "lodash/isObject",
     "lodash/isString",
+    "lodash/isInteger",
     "moment",
-    "./authErrors",
-    "./stringsEqual"
-], function(isArray, isEmpty, isFunction, isObject, isString, moment, authErrors, stringsEqual) {
+    "./authErrors"
+], function(isArray, isEmpty, isFunction, isObject, isString, isInteger, moment, authErrors) {
     "use strict";
 
-    return function(loadUser, createTokenHash, token) {
+    return function(loadUser, token) {
         // check callbacks
-        if (!isFunction(loadUser) || !isFunction(createTokenHash)) {
+        if (!isFunction(loadUser)) {
             return {
                 error: authErrors.INVALID_CALLBACK
             };
         }
 
         // check token well-formed
-        if (!isObject(token) || 
-                !token.hasOwnProperty("userid") || !isString(token.userid) || isEmpty(token.userid) ||
-                !token.hasOwnProperty("until") || !isString(token.until) || isEmpty(token.until) ||
-                !token.hasOwnProperty("hash") || !isString(token.hash) || isEmpty(token.hash)) {
+        if (!isObject(token) || !token.hasOwnProperty("sessionKey") || isEmpty(token.sessionKey)) {
             return {
                 error: authErrors.TOKEN_NOT_WELL_FORMED
             };
         }
 
-        // check ISO 8601 date format
-        var tokDate = moment(token.until, moment.ISO_8601, true);
-        if (!tokDate.isValid()) {
-            return {
-                error: authErrors.INVALID_DATE_FORMAT
-            };
-        }
-
-        // check expiry date
-        if (moment().isAfter(tokDate)) {
-            return {
-                error: authErrors.TOKEN_EXPIRED
-            };
-        }
-
         // load user
-        var user = loadUser(token.userid);
+        var user = loadUser(token.sessionKey);
         if (!isObject(user)) {
             return {
-                error: authErrors.USER_NOT_FOUND
+                error: authErrors.INVALID_TOKEN_HASH
             };
         }
         if (!user.hasOwnProperty("sessionKey") || !isString(user.sessionKey) || isEmpty(user.sessionKey) ||
+            !user.hasOwnProperty("sessionDurationMinutes") || !isInteger(user.sessionDurationMinutes) ||
+            !user.hasOwnProperty("sessionStartTime") || !isString(user.sessionStartTime) || isEmpty(user.sessionStartTime) ||
                 !user.hasOwnProperty("roles") || !isArray(user.roles)) {
             return {
                 error: authErrors.INVALID_USER_LOADED,
@@ -74,14 +58,14 @@ define([
             };
         }
 
-        // re-create token hash and compare it
-        var localHash = createTokenHash(token.userid, user.sessionKey, tokDate);
-        if (!stringsEqual(localHash, token.hash)) {
+        // check expiry date
+        var now = moment();
+        var validUntil = moment(user.sessionStartTime).add(user.sessionDurationMinutes, "minutes");
+        if (now.isAfter(validUntil)) {
             return {
-                error: authErrors.INVALID_TOKEN_HASH
+                error: authErrors.TOKEN_EXPIRED
             };
         }
-
         // return roles
         return user.roles;
     };

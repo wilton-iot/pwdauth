@@ -18,6 +18,7 @@ define([
     // modules
     "assert",
     "moment",
+    "random",
     "lodash/isArray",
     "lodash/isNil",
     "lodash/isObject",
@@ -27,12 +28,11 @@ define([
     "pwdauth/authorize",
     // auth callbacks
     "pwdauth/createPasswordHash",
-    "pwdauth/createRequestHash",
-    "pwdauth/createTokenHash"
+    "pwdauth/createRequest",
 ], function(
-        assert, moment, isArray, isNil, isObject, // modules
+        assert, moment, random, isArray, isNil, isObject, // modules
         authErrors, authenticate, authorize, // auth api
-        createPasswordHash, createRequestHash, createTokenHash // auth callbacks
+        createPasswordHash, createRequest // auth callbacks
 ) {
     "use strict";
 
@@ -40,42 +40,62 @@ define([
 
     // prepare env
 
-    function loadUser(userId) {
-        // DB access logic or cache lookup is implied here
-        if ("foo" === userId){
-            return {
-                pwdHash: createPasswordHash("foo", "secret1"),
-                sessionKey: "boo",
-                sessionDurationMinutes: 42,
-                roles: ["foo1", "bar1"]
-            };
+    // DB access logic or cache lookup is implied here
+
+    var user = {
+        pwdHash: createPasswordHash("password1", "login1"),
+        sessionKey: undefined,
+        sessionStartTime: undefined,
+        sessionDurationMinutes: 30,
+        roles: ["foo1", "bar1"]
+    };
+
+    function createToken(user, request) {
+        user.sessionKey = random.uuid4(random.engines.mt19937().autoSeed())
+        user.sessionStartTime = moment().format()
+        //logger: created $token for $user by $request
+        return user.sessionKey
+    }
+    
+    function loadUserById(userId) {
+        if ("login1" === userId){
+            return user
         }
         return null;
     }
 
+    function loadUserByToken(token) {
+        if (user.sessionKey === token){
+            return user
+        }
+        return null;
+    }
+    // DB access logic or cache lookup ends here
+
     function myAuthenticate(request) {
-        return authenticate(loadUser, createRequestHash, createTokenHash, request);
+        return authenticate(loadUserById, createRequest, createToken, request);
     }
 
     function myAuthorize(token) {
-        return authorize(loadUser, createTokenHash, token);
+        return authorize(loadUserByToken, token);
     }
 
 
     // test success
 
     // process user input
-    var userId = "foo";
-    var pwdClear = "secret1";
-    var pwdHash = createPasswordHash(userId, pwdClear);
+    var userId = "login1";
+    var pwdClear = "password1";
+    var pwdHash = createPasswordHash(pwdClear, userId);
     var timestamp = moment();
-
+    var tokenRequest = createRequest(
+        '/auth',
+        userId,
+        pwdHash,
+        timestamp.format()
+    )
     // obtain token
-    var token = myAuthenticate({
-        userid: userId,
-        timestamp: timestamp.format(),
-        hash: createRequestHash(userId, pwdHash, timestamp)
-    });
+    var token = myAuthenticate(tokenRequest);
 
     assert(isObject(token));
     assert(isNil(token.error));
@@ -95,19 +115,19 @@ define([
     assert.equal(myAuthenticate("foo").error, authErrors.REQUEST_NOT_WELL_FORMED);
     assert.equal(myAuthenticate({foo: "bar"}).error, authErrors.REQUEST_NOT_WELL_FORMED);
     assert.equal(myAuthenticate({
-        userid: userId,
+        acessKey: userId,
         timestamp: timestamp.format("MM.DD.YYYY"),
-        hash: "..."
+        hmac: "..."
     }).error, authErrors.INVALID_DATE_FORMAT);
     assert.equal(myAuthenticate({
-        userid: "foo1",
+        acessKey: "foo1",
         timestamp: timestamp.format(),
-        hash: "..."
+        hmac: "..."
     }).error, authErrors.USER_NOT_FOUND);
     assert.equal(myAuthenticate({
-        userid: "foo",
+        acessKey: userId,
         timestamp: timestamp.format(),
-        hash: "..."
+        hmac: "..."
     }).error, authErrors.INVALID_REQUEST_HASH);
 
 
@@ -115,24 +135,10 @@ define([
 
     assert.equal(authorize({foo: "bar"}).error, authErrors.INVALID_CALLBACK);
     assert.equal(myAuthorize(null).error, authErrors.TOKEN_NOT_WELL_FORMED);
-    assert.equal(myAuthorize("foo").error, authErrors.TOKEN_NOT_WELL_FORMED);
     assert.equal(myAuthorize({foo: "bar"}).error, authErrors.TOKEN_NOT_WELL_FORMED);
-    assert.equal(myAuthorize({
-        userid: userId,
-        until: timestamp.format("MM.DD.YYYY"),
-        hash: "..."
-    }).error, authErrors.INVALID_DATE_FORMAT);
-    assert.equal(myAuthorize({
-        userid: userId,
-        until: moment().add(-1, "minutes").format(),
-        hash: "..."
-    }).error, authErrors.TOKEN_EXPIRED);
-    assert.equal(myAuthorize({
-        userid: userId,
-        until: moment().add(1, "minutes").format(),
-        hash: "..."
-    }).error, authErrors.INVALID_TOKEN_HASH);
-
+    assert.equal(myAuthorize({sessionKey: "foo"}).error, authErrors.INVALID_TOKEN_HASH);
+    user.sessionStartTime = moment().add(-40, "minutes").format()
+    assert.equal(myAuthorize(token).error, authErrors.TOKEN_EXPIRED);
     // no-op to run directly
 
     return {

@@ -18,18 +18,18 @@ define([
     "lodash/isEmpty",
     "lodash/isString",
     "./sha256"
-], function(isEmpty, isString, sha256) {
+], function(isEmpty, isString, hash) {
     "use strict";
 
-    return function(userId, pwdClear) {
+    return function(pwdClear, userId) {
         if (!isString(userId) || isEmpty(userId)) {
             throw new Error("Invalid 'userId' parameter specified");
         }
         if (!isString(pwdClear) || isEmpty(pwdClear)) {
             throw new Error("Invalid 'pwdClear' parameter specified");
         }
+        var salt = hash(userId)
         // https://security.stackexchange.com/a/39498/166297
-        var salt = sha256(userId);
-        return sha256(pwdClear + salt);
+        return hash(pwdClear + salt);
     };
 });
