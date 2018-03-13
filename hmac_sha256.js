@@ -55,7 +55,7 @@ define([
         var str = defaultString(data);
         var sBytes = utf8.encode(str);
         var k = defaultString(key);
-        var kBytes = utf8.encode(str);
+        var kBytes = utf8.encode(k);
         return hmac(kBytes, sBytes, encoding);
     };
 

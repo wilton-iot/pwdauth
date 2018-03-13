@@ -21,7 +21,7 @@ define([
     "random",
     "lodash/isArray",
     "lodash/isNil",
-    "lodash/isString",
+    "lodash/isObject",
     // auth api
     "pwdauth/authErrors",
     "pwdauth/authenticate",
@@ -30,7 +30,7 @@ define([
     "pwdauth/createPasswordHash",
     "pwdauth/createRequest",
 ], function(
-        assert, moment, random, isArray, isNil, isString, // modules
+        assert, moment, random, isArray, isNil, isObject, // modules
         authErrors, authenticate, authorize, // auth api
         createPasswordHash, createRequest // auth callbacks
 ) {
@@ -50,9 +50,10 @@ define([
         roles: ["foo1", "bar1"]
     };
 
-    function createToken() {
+    function createToken(user, request) {
         user.sessionKey = random.uuid4(random.engines.mt19937().autoSeed())
         user.sessionStartTime = moment().format()
+        //logger: created $token for $user by $request
         return user.sessionKey
     }
     
@@ -96,7 +97,7 @@ define([
     // obtain token
     var token = myAuthenticate(tokenRequest);
 
-    assert(isString(token));
+    assert(isObject(token));
     assert(isNil(token.error));
 
     // get roles
@@ -135,7 +136,7 @@ define([
     assert.equal(authorize({foo: "bar"}).error, authErrors.INVALID_CALLBACK);
     assert.equal(myAuthorize(null).error, authErrors.TOKEN_NOT_WELL_FORMED);
     assert.equal(myAuthorize({foo: "bar"}).error, authErrors.TOKEN_NOT_WELL_FORMED);
-    assert.equal(myAuthorize("foo").error, authErrors.INVALID_TOKEN_HASH);
+    assert.equal(myAuthorize({sessionKey: "foo"}).error, authErrors.INVALID_TOKEN_HASH);
     user.sessionStartTime = moment().add(-40, "minutes").format()
     assert.equal(myAuthorize(token).error, authErrors.TOKEN_EXPIRED);
     // no-op to run directly

@@ -24,15 +24,17 @@ define([
 
     return function(path, userId, pwdHash, timestamp) {
 
+        var label = "PP";
+
         function signature(path, pwdHash, timestamp) {
-            var kDate = hmac('PP' + pwdHash, timestamp)
-            var kCredentials = hmac(kDate, 'pp_request')
+            var kDate = hmac(label + pwdHash, timestamp)
+            var kCredentials = hmac(kDate, label.toLowerCase + '_request')
             return hmac(kCredentials, stringToSign(path, timestamp), true)
         }
 
         function stringToSign(path, timestamp) {
             return [
-              'PP-HMAC-SHA256',
+              label+ '-HMAC-SHA256',
               timestamp,
               hash(canonicalString(path)),
             ].join('\n')

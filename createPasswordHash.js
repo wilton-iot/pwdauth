@@ -21,14 +21,15 @@ define([
 ], function(isEmpty, isString, hash) {
     "use strict";
 
-    return function(pwdClear, salt) {
-        if (!isString(salt) || isEmpty(salt)) {
-            throw new Error("Invalid 'salt' parameter specified");
+    return function(pwdClear, userId) {
+        if (!isString(userId) || isEmpty(userId)) {
+            throw new Error("Invalid 'userId' parameter specified");
         }
         if (!isString(pwdClear) || isEmpty(pwdClear)) {
             throw new Error("Invalid 'pwdClear' parameter specified");
         }
+        var salt = hash(userId)
         // https://security.stackexchange.com/a/39498/166297
-        return hash(hash(pwdClear) + salt);
+        return hash(pwdClear + salt);
     };
 });

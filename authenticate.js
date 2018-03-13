@@ -17,13 +17,12 @@
 define([
     "lodash/isEmpty",
     "lodash/isFunction",
-    "lodash/isInteger",
     "lodash/isObject",
     "lodash/isString",
     "moment",
     "./authErrors",
     "./stringsEqual"
-], function(isEmpty, isFunction, isInteger, isObject, isString, moment, authErrors, stringsEqual) {
+], function(isEmpty, isFunction, isObject, isString, moment, authErrors, stringsEqual) {
     "use strict";
 
     return function(loadUser, createRequest, createToken, request) {
@@ -80,7 +79,9 @@ define([
             };
         }
         //create token here
-        var token = createToken()
-        return token
+        var token = createToken(user, request)
+        return {
+            sessionKey: token
+        }
     };
 });

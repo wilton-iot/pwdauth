@@ -19,6 +19,5 @@ define([
     "pwdauth/authenticate",
     "pwdauth/authorize",
     "pwdauth/createPasswordHash",
-    "pwdauth/createRequestHash",
-    "pwdauth/createTokenHash"
+    "pwdauth/createRequest"
 ], function() {});

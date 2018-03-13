@@ -22,9 +22,8 @@ define([
     "lodash/isString",
     "lodash/isInteger",
     "moment",
-    "./authErrors",
-    "./stringsEqual"
-], function(isArray, isEmpty, isFunction, isObject, isString, isInteger, moment, authErrors, stringsEqual) {
+    "./authErrors"
+], function(isArray, isEmpty, isFunction, isObject, isString, isInteger, moment, authErrors) {
     "use strict";
 
     return function(loadUser, token) {
@@ -36,14 +35,14 @@ define([
         }
 
         // check token well-formed
-        if (!isString(token) || isEmpty(token)) {
+        if (!isObject(token) || !token.hasOwnProperty("sessionKey") || isEmpty(token.sessionKey)) {
             return {
                 error: authErrors.TOKEN_NOT_WELL_FORMED
             };
         }
 
         // load user
-        var user = loadUser(token);
+        var user = loadUser(token.sessionKey);
         if (!isObject(user)) {
             return {
                 error: authErrors.INVALID_TOKEN_HASH
