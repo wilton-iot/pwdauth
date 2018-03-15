@@ -36,7 +36,7 @@ define([
 
         // check token well-formed
         if (!isObject(token) || 
-            !token.hasOwnProperty("sessionKey") || !isString(user.sessionStartTime) || isEmpty(token.sessionKey)) {
+            !token.hasOwnProperty("sessionKey") || !isString(token.sessionKey) || isEmpty(token.sessionKey)) {
             return {
                 error: authErrors.TOKEN_NOT_WELL_FORMED
             };
