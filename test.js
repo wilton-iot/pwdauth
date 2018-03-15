@@ -49,7 +49,8 @@ define([
         sessionKey: undefined,
         sessionStartTime: undefined,
         sessionDurationMinutes: 30,
-        roles: ["foo1", "bar1"]
+        role: "admin",
+        rights: ["foo1", "bar1"]
     };
 
     function createToken(user, request) {
@@ -106,9 +107,10 @@ define([
     var user = myAuthorize(token);
 
     assert(isString(user.id));
-    assert(isArray(user.roles));
+    assert(isString(user.role));
+    assert(isArray(user.rights));
     assert(isNil(user.error));
-    assert.equal(user.roles.length, 2);
+    assert.equal(user.rights.length, 2);
 
 
     // test authenticate error messages

@@ -35,7 +35,8 @@ define([
         }
 
         // check token well-formed
-        if (!isObject(token) || !token.hasOwnProperty("sessionKey") || isEmpty(token.sessionKey)) {
+        if (!isObject(token) || 
+            !token.hasOwnProperty("sessionKey") || !isString(user.sessionStartTime) || isEmpty(token.sessionKey)) {
             return {
                 error: authErrors.TOKEN_NOT_WELL_FORMED
             };
@@ -48,11 +49,11 @@ define([
                 error: authErrors.INVALID_TOKEN_HASH
             };
         }
-        if (!user.hasOwnProperty("sessionKey") || !isString(user.sessionKey) || isEmpty(user.sessionKey) ||
-            !user.hasOwnProperty("sessionDurationMinutes") || !isInteger(user.sessionDurationMinutes) ||
+        if (!user.hasOwnProperty("sessionDurationMinutes") || !isInteger(user.sessionDurationMinutes) ||
             !user.hasOwnProperty("sessionStartTime") || !isString(user.sessionStartTime) || isEmpty(user.sessionStartTime) ||
             !user.hasOwnProperty("id") || !isString(user.id) || isEmpty(user.id) ||
-                !user.hasOwnProperty("roles") || !isArray(user.roles)) {
+            !user.hasOwnProperty("role") || !isString(user.role) || isEmpty(user.role) ||
+                !user.hasOwnProperty("rights") || !isArray(user.rights)) {
             return {
                 error: authErrors.INVALID_USER_LOADED,
                 user: user
@@ -70,7 +71,8 @@ define([
         // return roles
         return {
             id: user.id,
-            roles: user.roles
+            role: user.role,
+            rights: user.rights
         };
     };
 });
