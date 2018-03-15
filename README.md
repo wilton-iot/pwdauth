@@ -15,6 +15,18 @@ License information
 
 This project is released under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
+API
+---
+1. Client side:
+   - createPasswordHash = function(password: String, userId: String)
+
+   - createRequest = function(path: String, userId: String, passwordHash: String, timestamp: String)
+
+2. Server side:
+   - authorize = function(loadUser: Function, token: String)
+
+   - authenticate = function(loadUser: Function, createRequest: Function, createToken: Function, request: Object) 
+
 Changelog
 ---------
 
