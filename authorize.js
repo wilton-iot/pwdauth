@@ -51,6 +51,7 @@ define([
         if (!user.hasOwnProperty("sessionKey") || !isString(user.sessionKey) || isEmpty(user.sessionKey) ||
             !user.hasOwnProperty("sessionDurationMinutes") || !isInteger(user.sessionDurationMinutes) ||
             !user.hasOwnProperty("sessionStartTime") || !isString(user.sessionStartTime) || isEmpty(user.sessionStartTime) ||
+            !user.hasOwnProperty("id") || !isString(user.id) || isEmpty(user.id) ||
                 !user.hasOwnProperty("roles") || !isArray(user.roles)) {
             return {
                 error: authErrors.INVALID_USER_LOADED,
@@ -67,6 +68,9 @@ define([
             };
         }
         // return roles
-        return user.roles;
+        return {
+            id: user.id,
+            roles: user.roles
+        };
     };
 });

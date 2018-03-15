@@ -22,6 +22,7 @@ define([
     "lodash/isArray",
     "lodash/isNil",
     "lodash/isObject",
+    "lodash/isString",
     // auth api
     "pwdauth/authErrors",
     "pwdauth/authenticate",
@@ -30,7 +31,7 @@ define([
     "pwdauth/createPasswordHash",
     "pwdauth/createRequest",
 ], function(
-        assert, moment, random, isArray, isNil, isObject, // modules
+        assert, moment, random, isArray, isNil, isObject, isString, // modules
         authErrors, authenticate, authorize, // auth api
         createPasswordHash, createRequest // auth callbacks
 ) {
@@ -42,7 +43,8 @@ define([
 
     // DB access logic or cache lookup is implied here
 
-    var user = {
+    var userInDB = {
+        id: "login1",
         pwdHash: createPasswordHash("password1", "login1"),
         sessionKey: undefined,
         sessionStartTime: undefined,
@@ -51,22 +53,22 @@ define([
     };
 
     function createToken(user, request) {
-        user.sessionKey = random.uuid4(random.engines.mt19937().autoSeed())
-        user.sessionStartTime = moment().format()
+        userInDB.sessionKey = random.uuid4(random.engines.mt19937().autoSeed())
+        userInDB.sessionStartTime = moment().format()
         //logger: created $token for $user by $request
-        return user.sessionKey
+        return userInDB.sessionKey
     }
     
     function loadUserById(userId) {
-        if ("login1" === userId){
-            return user
+        if (userInDB.id === userId){
+            return userInDB
         }
         return null;
     }
 
     function loadUserByToken(token) {
-        if (user.sessionKey === token){
-            return user
+        if (userInDB.sessionKey === token){
+            return userInDB
         }
         return null;
     }
@@ -101,11 +103,12 @@ define([
     assert(isNil(token.error));
 
     // get roles
-    var roles = myAuthorize(token);
+    var user = myAuthorize(token);
 
-    assert(isArray(roles));
-    assert(isNil(roles.error));
-    assert.equal(roles.length, 2);
+    assert(isString(user.id));
+    assert(isArray(user.roles));
+    assert(isNil(user.error));
+    assert.equal(user.roles.length, 2);
 
 
     // test authenticate error messages
@@ -137,7 +140,7 @@ define([
     assert.equal(myAuthorize(null).error, authErrors.TOKEN_NOT_WELL_FORMED);
     assert.equal(myAuthorize({foo: "bar"}).error, authErrors.TOKEN_NOT_WELL_FORMED);
     assert.equal(myAuthorize({sessionKey: "foo"}).error, authErrors.INVALID_TOKEN_HASH);
-    user.sessionStartTime = moment().add(-40, "minutes").format()
+    userInDB.sessionStartTime = moment().add(-40, "minutes").format()
     assert.equal(myAuthorize(token).error, authErrors.TOKEN_EXPIRED);
     // no-op to run directly
 
