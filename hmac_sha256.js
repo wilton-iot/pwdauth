@@ -17,9 +17,10 @@
 define([
     "lodash/isNil",
     "lodash/isString",
+    "lodash/isArray",
     "sjcl",
     "utf8"
-], function(isNil, isString, sjcl, utf8) {
+], function(isNil, isString, isArray, sjcl, utf8) {
     "use strict";
 
     function hmac(key, string, encoding) {
@@ -32,14 +33,20 @@ define([
 
     function defaultString(str) {
         if (isString(str)) {
-            return str;
+            return utf8.encode(str);
         } else if (!isNil(str)) {
-            return String(str);
+            return utf8.encode(String(str));
         } else {
-            return "";
+            return utf8.encode("");
         }
     }
-
+    function defaultKey(key) {
+        if(isArray(key)) {
+            return key
+        } else {
+            return defaultString(key)
+        }
+    }
 // https://github.com/bitwiseshiftleft/sjcl/issues/225
 //
 // python -c "import hashlib;print hashlib.sha256('foo').hexdigest()"
@@ -53,10 +60,7 @@ define([
 // 
     return function(key, data, encoding) {
         var str = defaultString(data);
-        var sBytes = utf8.encode(str);
-        var k = defaultString(key);
-        var kBytes = utf8.encode(k);
-        return hmac(kBytes, sBytes, encoding);
+        var k = defaultKey(key);
+        return hmac(k, str, encoding);
     };
-
 });
