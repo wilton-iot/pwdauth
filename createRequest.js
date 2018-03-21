@@ -28,7 +28,7 @@ define([
 
         function signature(path, pwdHash, timestamp) {
             var kDate = hmac(label + pwdHash, timestamp)
-            var kCredentials = hmac(kDate, label.toLowerCase + '_request')
+            var kCredentials = hmac(kDate, label.toLowerCase() + '_request')
             return hmac(kCredentials, stringToSign(path, timestamp), true)
         }
 
