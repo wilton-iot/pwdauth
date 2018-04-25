@@ -82,7 +82,8 @@ define([
         return {
             acessKey: userId,
             hmac: signature(path, pwdHash, timestamp),
-            timestamp: timestamp
+            timestamp: timestamp,
+            path: path
         }
     };
 });

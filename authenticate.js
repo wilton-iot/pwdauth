@@ -37,7 +37,8 @@ define([
         if (!isObject(request) || 
                 !request.hasOwnProperty("acessKey") || !isString(request.acessKey) || isEmpty(request.acessKey) ||
                 !request.hasOwnProperty("hmac") || !isString(request.hmac) || isEmpty(request.hmac) ||
-                !request.hasOwnProperty("timestamp") || !isString(request.timestamp) || isEmpty(request.timestamp) 
+                !request.hasOwnProperty("timestamp") || !isString(request.timestamp) || isEmpty(request.timestamp) ||
+                !request.hasOwnProperty("path") || !isString(request.path) || isEmpty(request.path) 
             ){
                 return {
                     error: authErrors.REQUEST_NOT_WELL_FORMED
@@ -68,7 +69,7 @@ define([
 
         // re-create request hash and compare it
         var localRequest = createRequest(
-            '/auth',
+            request.path,
             request.acessKey,
             user.pwdHash,
             request.timestamp
