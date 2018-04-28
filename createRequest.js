@@ -22,46 +22,45 @@ define([
 ], function(isEmpty, isString, hmac, hash) {
     "use strict";
 
-    return function(path, userId, pwdHash, timestamp) {
+    var label = "PP";
 
-        var label = "PP";
+    function signature(path, pwdHash, timestamp) {
+        var kDate = hmac(label + pwdHash, timestamp);
+        var kCredentials = hmac(kDate, label.toLowerCase() + "_request");
+        return hmac(kCredentials, stringToSign(path, timestamp), true);
+    }
 
-        function signature(path, pwdHash, timestamp) {
-            var kDate = hmac(label + pwdHash, timestamp);
-            var kCredentials = hmac(kDate, label.toLowerCase() + "_request");
-            return hmac(kCredentials, stringToSign(path, timestamp), true);
-        }
-
-        function stringToSign(path, timestamp) {
-            return [
-              label+ "-HMAC-SHA256",
-              timestamp,
-              hash(path)
-            ].join("\n");
-        }
-        
-        function canonicalString(path) {
-            if (path !== "/") {
-              path = path.replace(/\/{2,}/g, "/");
-              path = path.split("/").reduce(function(path, piece) {
-                if (piece === "..") {
-                  path.pop();
-                } else if (piece !== ".") {
-                  path.push(encodeRfc3986(encodeURIComponent(piece)));
-                }
-                return path;
-              }, []).join("/");
-              if (path[0] !== "/") path = "/" + path;
+    function stringToSign(path, timestamp) {
+        return [
+          label+ "-HMAC-SHA256",
+          timestamp,
+          hash(path)
+        ].join("\n");
+    }
+    
+    function canonicalString(path) {
+        if (path !== "/") {
+          path = path.replace(/\/{2,}/g, "/");
+          path = path.split("/").reduce(function(path, piece) {
+            if (piece === "..") {
+              path.pop();
+            } else if (piece !== ".") {
+              path.push(encodeRfc3986(encodeURIComponent(piece)));
             }
             return path;
+          }, []).join("/");
+          if (path[0] !== "/") path = "/" + path;
         }
+        return path;
+    }
 
-        function encodeRfc3986(urlEncodedString) {
-            return urlEncodedString.replace(/[!'()*]/g, function(c) {
-              return "%" + c.charCodeAt(0).toString(16).toUpperCase();
-            });
-        }
+    function encodeRfc3986(urlEncodedString) {
+        return urlEncodedString.replace(/[!'()*]/g, function(c) {
+          return "%" + c.charCodeAt(0).toString(16).toUpperCase();
+        });
+    }
 
+    return function(path, userId, pwdHash, timestamp) {
         if (!isString(path) || isEmpty(path)) {
             throw new Error("Invalid 'path' parameter specified");
         }
