@@ -22,7 +22,7 @@ define([
 ], function(isEmpty, isString, hmac, hash) {
     "use strict";
 
-    var label = "PP";
+    var label = "PWDAUTH";
 
     function signature(path, pwdHash, timestamp) {
         var kDate = hmac(label + pwdHash, timestamp);
