@@ -28,7 +28,7 @@ define([
         if (!isString(pwdClear) || isEmpty(pwdClear)) {
             throw new Error("Invalid 'pwdClear' parameter specified");
         }
-        var salt = hash(userId)
+        var salt = hash(userId);
         // https://security.stackexchange.com/a/39498/166297
         return hash(pwdClear + salt);
     };

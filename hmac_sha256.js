@@ -24,11 +24,11 @@ define([
     "use strict";
 
     function hmac(key, string, encoding) {
-        var result = new sjcl.misc.hmac(key).encrypt(string)
+        var result = new sjcl.misc.hmac(key).encrypt(string);
         if (encoding) {
-          result = sjcl.codec.hex.fromBits(result)
+          result = sjcl.codec.hex.fromBits(result);
         }
-        return result
+        return result;
     }
 
     function defaultString(str) {
@@ -42,9 +42,9 @@ define([
     }
     function defaultKey(key) {
         if(isArray(key)) {
-            return key
+            return key;
         } else {
-            return defaultString(key)
+            return defaultString(key);
         }
     }
 // https://github.com/bitwiseshiftleft/sjcl/issues/225

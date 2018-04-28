@@ -73,16 +73,16 @@ define([
             request.acessKey,
             user.pwdHash,
             request.timestamp
-        )
+        );
         if (!stringsEqual(localRequest.hmac, request.hmac)) {
             return {
                 error: authErrors.INVALID_REQUEST_HASH
             };
         }
         //create token here
-        var token = createToken(user, request)
+        var token = createToken(user, request);
         return {
             sessionKey: token
-        }
+        };
     };
 });

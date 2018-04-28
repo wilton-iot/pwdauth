@@ -23,9 +23,9 @@ define([
     "use strict";
 
     function hash(string) {
-        var result = sjcl.hash.sha256.hash(string)
-        result = sjcl.codec.hex.fromBits(result)
-        return result
+        var result = sjcl.hash.sha256.hash(string);
+        result = sjcl.codec.hex.fromBits(result);
+        return result;
     }
 
     function defaultString(str) {

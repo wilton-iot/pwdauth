@@ -29,7 +29,7 @@ define([
     "pwdauth/authorize",
     // auth callbacks
     "pwdauth/createPasswordHash",
-    "pwdauth/createRequest",
+    "pwdauth/createRequest"
 ], function(
         assert, moment, random, isArray, isNil, isObject, isString, // modules
         authErrors, authenticate, authorize, // auth api
@@ -54,22 +54,22 @@ define([
     };
 
     function createToken(user, request) {
-        userInDB.sessionKey = random.uuid4(random.engines.mt19937().autoSeed())
-        userInDB.sessionStartTime = moment().format()
+        userInDB.sessionKey = random.uuid4(random.engines.mt19937().autoSeed());
+        userInDB.sessionStartTime = moment().format();
         //logger: created $token for $user by $request
-        return userInDB.sessionKey
+        return userInDB.sessionKey;
     }
     
     function loadUserById(userId) {
         if (userInDB.id === userId){
-            return userInDB
+            return userInDB;
         }
         return null;
     }
 
     function loadUserByToken(token) {
         if (userInDB.sessionKey === token){
-            return userInDB
+            return userInDB;
         }
         return null;
     }
@@ -96,7 +96,7 @@ define([
         userId,
         pwdHash,
         timestamp.format()
-    )
+    );
     // obtain token
     var token = myAuthenticate(tokenRequest);
 
@@ -145,7 +145,7 @@ define([
     assert.equal(myAuthorize(null).error, authErrors.TOKEN_NOT_WELL_FORMED);
     assert.equal(myAuthorize({foo: "bar"}).error, authErrors.TOKEN_NOT_WELL_FORMED);
     assert.equal(myAuthorize({sessionKey: "foo"}).error, authErrors.INVALID_TOKEN_HASH);
-    userInDB.sessionStartTime = moment().add(-40, "minutes").format()
+    userInDB.sessionStartTime = moment().add(-40, "minutes").format();
     assert.equal(myAuthorize(token).error, authErrors.TOKEN_EXPIRED);
     // no-op to run directly
 

@@ -27,39 +27,39 @@ define([
         var label = "PP";
 
         function signature(path, pwdHash, timestamp) {
-            var kDate = hmac(label + pwdHash, timestamp)
-            var kCredentials = hmac(kDate, label.toLowerCase() + '_request')
-            return hmac(kCredentials, stringToSign(path, timestamp), true)
+            var kDate = hmac(label + pwdHash, timestamp);
+            var kCredentials = hmac(kDate, label.toLowerCase() + "_request");
+            return hmac(kCredentials, stringToSign(path, timestamp), true);
         }
 
         function stringToSign(path, timestamp) {
             return [
-              label+ '-HMAC-SHA256',
+              label+ "-HMAC-SHA256",
               timestamp,
-              hash(path),
-            ].join('\n')
+              hash(path)
+            ].join("\n");
         }
         
         function canonicalString(path) {
-            if (path !== '/') {
-              path = path.replace(/\/{2,}/g, '/')
-              path = path.split('/').reduce(function(path, piece) {
-                if (piece === '..') {
-                  path.pop()
-                } else if (piece !== '.') {
-                  path.push(encodeRfc3986(encodeURIComponent(piece)))
+            if (path !== "/") {
+              path = path.replace(/\/{2,}/g, "/");
+              path = path.split("/").reduce(function(path, piece) {
+                if (piece === "..") {
+                  path.pop();
+                } else if (piece !== ".") {
+                  path.push(encodeRfc3986(encodeURIComponent(piece)));
                 }
-                return path
-              }, []).join('/')
-              if (path[0] !== '/') path = '/' + path
+                return path;
+              }, []).join("/");
+              if (path[0] !== "/") path = "/" + path;
             }
             return path;
         }
 
         function encodeRfc3986(urlEncodedString) {
             return urlEncodedString.replace(/[!'()*]/g, function(c) {
-              return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-            })
+              return "%" + c.charCodeAt(0).toString(16).toUpperCase();
+            });
         }
 
         if (!isString(path) || isEmpty(path)) {
@@ -82,6 +82,6 @@ define([
             hmac: signature(canonicalPath, pwdHash, timestamp),
             timestamp: timestamp,
             path: canonicalPath
-        }
+        };
     };
 });
