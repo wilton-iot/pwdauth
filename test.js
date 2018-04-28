@@ -92,7 +92,7 @@ define([
     var pwdHash = createPasswordHash(pwdClear, userId);
     var timestamp = moment();
     var tokenRequest = createRequest(
-        '/auth',
+        "/auth1",
         userId,
         pwdHash,
         timestamp.format()
@@ -120,16 +120,19 @@ define([
     assert.equal(myAuthenticate("foo").error, authErrors.REQUEST_NOT_WELL_FORMED);
     assert.equal(myAuthenticate({foo: "bar"}).error, authErrors.REQUEST_NOT_WELL_FORMED);
     assert.equal(myAuthenticate({
+        path: "/auth1",
         acessKey: userId,
         timestamp: timestamp.format("MM.DD.YYYY"),
         hmac: "..."
     }).error, authErrors.INVALID_DATE_FORMAT);
     assert.equal(myAuthenticate({
+        path: "/auth2",
         acessKey: "foo1",
         timestamp: timestamp.format(),
         hmac: "..."
     }).error, authErrors.USER_NOT_FOUND);
     assert.equal(myAuthenticate({
+        path: "/auth2",
         acessKey: userId,
         timestamp: timestamp.format(),
         hmac: "..."

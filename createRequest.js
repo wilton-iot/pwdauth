@@ -36,7 +36,7 @@ define([
             return [
               label+ '-HMAC-SHA256',
               timestamp,
-              hash(canonicalString(path)),
+              hash(path),
             ].join('\n')
         }
         
@@ -53,11 +53,7 @@ define([
               }, []).join('/')
               if (path[0] !== '/') path = '/' + path
             }
-        
-            return [
-              'GET',
-              path,
-            ].join('\n')
+            return path;
         }
 
         function encodeRfc3986(urlEncodedString) {
@@ -79,10 +75,13 @@ define([
             throw new Error("Invalid 'timestamp' parameter specified");
         }
 
+        var canonicalPath = canonicalString(path);
+
         return {
             acessKey: userId,
-            hmac: signature(path, pwdHash, timestamp),
-            timestamp: timestamp
+            hmac: signature(canonicalPath, pwdHash, timestamp),
+            timestamp: timestamp,
+            path: canonicalPath
         }
     };
 });
