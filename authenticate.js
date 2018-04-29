@@ -25,9 +25,9 @@ define([
 ], function(isEmpty, isFunction, isObject, isString, moment, authErrors, stringsEqual) {
     "use strict";
 
-    return function(loadUser, createRequest, createToken, request) {
+    return function(loadUser, createRequest, createSession, request) {
         // check callbacks
-        if (!isFunction(loadUser) || !isFunction(createRequest) || !isFunction(createToken)) {
+        if (!isFunction(loadUser) || !isFunction(createRequest) || !isFunction(createSession)) {
             return {
                 error: authErrors.INVALID_CALLBACK
             };
@@ -44,7 +44,7 @@ define([
                     error: authErrors.REQUEST_NOT_WELL_FORMED
                 };
             }
-        
+
         // check ISO 8601 date format
         var reqDate = moment(request.timestamp, moment.ISO_8601, true);
         if (!reqDate.isValid()) {
@@ -52,7 +52,7 @@ define([
                 error: authErrors.INVALID_DATE_FORMAT
             };
         }
-        
+
         // load user
         var user = loadUser(request.acessKey);
         if (!isObject(user)) {
@@ -79,10 +79,19 @@ define([
                 error: authErrors.INVALID_REQUEST_HASH
             };
         }
-        //create token here
-        var token = createToken(user, request);
+
+        // create session
+        var sessionKey = createSession(user, request);
+        if (!isString(sessionKey) || isEmpty(sessionKey)) {
+            return {
+                error: authErrors.INVALID_SESSION_KEY,
+                sessionKey: sessionKey
+            };
+        }
+
+        // return a token
         return {
-            sessionKey: token
+            sessionKey: sessionKey
         };
     };
 });

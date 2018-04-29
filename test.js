@@ -53,10 +53,9 @@ define([
         rights: ["foo1", "bar1"]
     };
 
-    function createToken(user, request) {
+    function createSession(user, request) {
         userInDB.sessionKey = random.uuid4(random.engines.mt19937().autoSeed());
         userInDB.sessionStartTime = moment().format();
-        //logger: created $token for $user by $request
         return userInDB.sessionKey;
     }
     
@@ -67,8 +66,8 @@ define([
         return null;
     }
 
-    function loadUserByToken(token) {
-        if (userInDB.sessionKey === token){
+    function loadUserBySessionKey(sessionKey) {
+        if (userInDB.sessionKey === sessionKey){
             return userInDB;
         }
         return null;
@@ -76,11 +75,11 @@ define([
     // DB access logic or cache lookup ends here
 
     function myAuthenticate(request) {
-        return authenticate(loadUserById, createRequest, createToken, request);
+        return authenticate(loadUserById, createRequest, createSession, request);
     }
 
     function myAuthorize(token) {
-        return authorize(loadUserByToken, token);
+        return authorize(loadUserBySessionKey, token);
     }
 
 
