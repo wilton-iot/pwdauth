@@ -35,7 +35,7 @@ define([
 
         // check request well-formed
         if (!isObject(request) || 
-                !request.hasOwnProperty("acessKey") || !isString(request.acessKey) || isEmpty(request.acessKey) ||
+                !request.hasOwnProperty("key") || !isString(request.key) || isEmpty(request.key) ||
                 !request.hasOwnProperty("hmac") || !isString(request.hmac) || isEmpty(request.hmac) ||
                 !request.hasOwnProperty("timestamp") || !isString(request.timestamp) || isEmpty(request.timestamp) ||
                 !request.hasOwnProperty("path") || !isString(request.path) || isEmpty(request.path) 
@@ -54,7 +54,7 @@ define([
         }
 
         // load user
-        var user = loadUser(request.acessKey);
+        var user = loadUser(request.key);
         if (!isObject(user)) {
             return {
                 error: authErrors.USER_NOT_FOUND
@@ -70,7 +70,7 @@ define([
         // re-create request hash and compare it
         var localRequest = createRequest(
             request.path,
-            request.acessKey,
+            request.key,
             user.pwdHash,
             request.timestamp
         );

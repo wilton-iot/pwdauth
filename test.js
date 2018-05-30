@@ -120,19 +120,19 @@ define([
     assert.equal(myAuthenticate({foo: "bar"}).error, authErrors.REQUEST_NOT_WELL_FORMED);
     assert.equal(myAuthenticate({
         path: "/auth1",
-        acessKey: userId,
+        key: userId,
         timestamp: timestamp.format("MM.DD.YYYY"),
         hmac: "..."
     }).error, authErrors.INVALID_DATE_FORMAT);
     assert.equal(myAuthenticate({
         path: "/auth2",
-        acessKey: "foo1",
+        key: "foo1",
         timestamp: timestamp.format(),
         hmac: "..."
     }).error, authErrors.USER_NOT_FOUND);
     assert.equal(myAuthenticate({
         path: "/auth2",
-        acessKey: userId,
+        key: userId,
         timestamp: timestamp.format(),
         hmac: "..."
     }).error, authErrors.INVALID_REQUEST_HASH);
