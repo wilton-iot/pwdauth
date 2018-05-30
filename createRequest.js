@@ -77,7 +77,7 @@ define([
         var canonicalPath = canonicalString(path);
 
         return {
-            acessKey: userId,
+            key: userId,
             hmac: signature(canonicalPath, pwdHash, timestamp),
             timestamp: timestamp,
             path: canonicalPath
