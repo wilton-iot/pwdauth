@@ -69,10 +69,6 @@ define([
             };
         }
         // return roles
-        return {
-            id: user.id,
-            role: user.role,
-            rights: user.rights
-        };
+        return user;
     };
 });
