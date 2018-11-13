@@ -23,12 +23,11 @@ define([
 ], function(isNil, isString, isArray, sjcl, utf8) {
     "use strict";
 
-    function hmac(key, string, encoding) {
+    function hmac(_key, string) {
+        var key = sjcl.codec.utf8String.toBits(_key);
         var result = new sjcl.misc.hmac(key).encrypt(string);
-        if (encoding) {
-          result = sjcl.codec.hex.fromBits(result);
-        }
-        return result;
+
+        return sjcl.codec.hex.fromBits(result);
     }
 
     function defaultString(str) {
