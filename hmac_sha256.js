@@ -23,12 +23,11 @@ define([
 ], function(isNil, isString, isArray, sjcl, utf8) {
     "use strict";
 
-    function hmac(key, string, encoding) {
+    function hmac(_key, string) {
+        var key = sjcl.codec.utf8String.toBits(_key);
         var result = new sjcl.misc.hmac(key).encrypt(string);
-        if (encoding) {
-          result = sjcl.codec.hex.fromBits(result);
-        }
-        return result;
+
+        return sjcl.codec.hex.fromBits(result);
     }
 
     function defaultString(str) {
@@ -58,9 +57,9 @@ define([
 // python -c "import hashlib;print hashlib.sha256('').hexdigest()"
 // e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 // 
-    return function(key, data, encoding) {
+    return function(key, data) {
         var str = defaultString(data);
         var k = defaultKey(key);
-        return hmac(k, str, encoding);
+        return hmac(k, str);
     };
 });
