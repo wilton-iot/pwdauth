@@ -40,6 +40,7 @@ define([
     print("test: pwdauth");
 
     // prepare env
+    var DEBUG_TEST = false;
 
     // DB access logic or cache lookup is implied here
 
@@ -89,6 +90,7 @@ define([
     var userId = "login1";
     var pwdClear = "password1";
     var pwdHash = createPasswordHash(pwdClear, userId);
+    DEBUG_TEST && console.log('___pwdHash ' + pwdHash);
     var timestamp = moment();
     var tokenRequest = createRequest(
         "/auth1",
@@ -96,6 +98,7 @@ define([
         pwdHash,
         timestamp.format()
     );
+    DEBUG_TEST && console.log('___tokenRequest ' + JSON.stringify(tokenRequest, null, 4));
     // obtain token
     var token = myAuthenticate(tokenRequest);
 

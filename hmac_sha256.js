@@ -57,9 +57,9 @@ define([
 // python -c "import hashlib;print hashlib.sha256('').hexdigest()"
 // e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 // 
-    return function(key, data, encoding) {
+    return function(key, data) {
         var str = defaultString(data);
         var k = defaultKey(key);
-        return hmac(k, str, encoding);
+        return hmac(k, str);
     };
 });
