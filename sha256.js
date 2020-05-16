@@ -17,8 +17,11 @@
 define([
     "lodash/isNil",
     "lodash/isString",
-    "sjcl",
-    "utf8"
+    "sjcl/core/sjcl",
+    "utf8",
+    // sjcl: imports only
+    "sjcl/core/codecHex",
+    "sjcl/core/sha256"
 ], function(isNil, isString, sjcl, utf8) {
     "use strict";
 
